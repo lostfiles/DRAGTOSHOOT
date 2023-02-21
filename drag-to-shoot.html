@@ -1,0 +1,102 @@
+<style>
+	html, body {
+		margin: 0;
+		padding: 0;
+	}
+</style>
+<canvas></canvas>
+<script>
+	
+	const canvas = document.querySelector('canvas');
+	const c      = canvas.getContext('2d');
+
+	canvas.width  = 400;
+	canvas.height = 400;
+
+	function vector2(x,y) {
+		return { x:x, y:y };
+	}
+
+	function Object(v) {
+		this.position = vector2(v.x,v.y);
+		this.scale    = vector2(20,20);
+		this.color    = 'red';
+
+		this.render = () => {
+			c.fillStyle = this.color;
+			c.fillRect(
+				this.position.x,this.position.y,
+				this.scale.x,this.scale.y
+			);
+		}
+	}
+
+	function Point(v) {
+		this.position = vector2(v.x,v.y);
+		this.scale    = vector2(5,5);
+		this.color    = 'white';
+
+		this.render = () => {
+			c.fillStyle = this.color;
+			c.fillRect(
+				this.position.x,this.position.y,
+				this.scale.x,this.scale.y
+			);
+		}
+	}
+
+	var CENTER = vector2(canvas.width/2, canvas.height/2);
+	var player = new Object(CENTER);
+	var points = [];
+	var mouse  = vector2(0,0);
+
+	document.onmousemove = (event) => {
+		mouse = vector2(event.clientX,event.clientY);
+
+		try {
+			for (var i = 0; i < points.length; i++) {
+				try {
+					if (i == 0) {
+						mp = vector2(
+							(mouse.x + player.position.x) / 2,
+							(mouse.y + player.position.y) / 2
+						);
+						points[i].position = mp;
+					} else {
+						mp = vector2(
+							(mouse.x + points[i-1].position.x) / 2,
+							(mouse.y + points[i-1].position.y) / 2
+						);
+						points[i].position = mp;
+					}
+				} catch {
+
+				}
+			}
+		} catch {}
+	}
+
+	document.onmousedown = () => {
+		mp = vector2(
+			(mouse.x + player.position.x) / 2,
+			(mouse.y + player.position.y) / 2
+		);
+		for (var i = 0; i < 10; i++) {
+			points.push(new Point(mp));
+		}
+	}
+
+	setInterval(() => {
+
+		c.fillStyle = 'black';
+		c.fillRect(0,0,canvas.width, canvas.height);
+
+		player.render();
+
+		for (var i = 0; i < points.length; i++) {
+			points[i].render();
+		}
+
+	}, 1000/30);
+
+</script>
